@@ -7,6 +7,21 @@ __pycache__/
 .eggs/
 dist/
 build/
+.Python
+develop-eggs/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
 # Environments
 .venv/
@@ -24,3 +39,6 @@ ENV/
 *.log
 *.swp
 .DS_Store
+
+# C extensions
+*.so
