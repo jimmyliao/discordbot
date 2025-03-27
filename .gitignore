@@ -42,3 +42,8 @@ ENV/
 
 # C extensions
 *.so
+
+.env
+
+# Cloud Run
+.gcloudignore
