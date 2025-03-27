@@ -17,6 +17,13 @@ intents.message_content = True
 
 client = discord.Client(intents=intents)
 
+
+PROMPT_ACKNOWLEDGE_MESSAGE_EN = "I have received your prompt. Please wait while I process it."
+PROMPT_ACKNOWLEDGE_MESSAGE_ZH = "我已收到您的提示。請稍等我處理。"
+PROMPT_ACKNOWLEDGE_MESSAGE_IMAGE_EN = "Please wait while I process Image."
+PROMPT_ACKNOWLEDGE_MESSAGE_IMAGE_ZH = "請稍候，我正在處理圖像。"
+
+
 async def download_image(url):
     """Downloads an image from a URL and returns it as bytes."""
     async with aiohttp.ClientSession() as session:
@@ -43,10 +50,13 @@ async def on_message(message):
         logging.info("No keyword detected, invoking Gemini API")
         prompt = message.content
         user_id = str(message.author.id) # Get user id
+        await message.channel.send(PROMPT_ACKNOWLEDGE_MESSAGE_EN)
+
         response = process_prompt(prompt, user_id)  # Use process_prompt and pass user_id
         if isinstance(response, str):
             await message.channel.send(response)
         elif isinstance(response, list):
+            await message.channel.send(PROMPT_ACKNOWLEDGE_MESSAGE_IMAGE_EN)
             # Handle image responses
             for image in response:
                 try:
@@ -57,11 +67,13 @@ async def on_message(message):
 
                     # Read the image from the temporary file into a BytesIO buffer
                     with open(temp_file_name, "rb") as f:
-                        image_buffer = BytesIO(f.read())
+                        with BytesIO() as image_binary:
+                            image_binary.write(f.read())
+                            image_binary.seek(0)
 
-                    # Send the image as a file
-                    file = discord.File(fp=image_buffer, filename="generated_image.png")
-                    await message.channel.send(file=file)
+                            # Send the image as a file
+                            file = discord.File(fp=image_binary, filename="generated_image.png")
+                            await message.channel.send(file=file)
 
                     # Clean up the temporary file
                     os.remove(temp_file_name)

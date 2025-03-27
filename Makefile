@@ -8,13 +8,6 @@ LOCAL_IMAGE_NAME := $(SERVICE_NAME)
 DISCORD_BOT_TOKEN := $(shell cat .env | grep DISCORD_BOT_TOKEN | cut -d'=' -f2)
 TARGET_PLATFORM := linux/amd64
 
-# Local run
-local:
-	python main.py
-
-local-docker:
-	docker run --env PORT=$(PORT) --env HOST=$(HOST) --env-file .env -p 8080:8080 $(IMAGE_NAME)
-
 # Build Docker image
 build:
 	docker buildx build --platform $(TARGET_PLATFORM) -t $(IMAGE_NAME) .
@@ -34,7 +27,13 @@ deploy:
 clean:
 	docker rmi $(LOCAL_IMAGE_NAME)
 
-run:
+run-local:
 	python main.py
 
-.PHONY: local build push deploy clean run
+run-docker:
+	@echo "Running Docker container"
+	gcloud config set project $(PROJECT_ID)
+	docker run --env PORT=$(PORT) --env HOST=$(HOST) --env-file .env -p 8080:8080 $(IMAGE_NAME)
+
+
+.PHONY: build push deploy clean run-local run-docker
