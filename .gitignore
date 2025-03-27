@@ -47,3 +47,6 @@ ENV/
 
 # Cloud Run
 .gcloudignore
+
+*.png
+

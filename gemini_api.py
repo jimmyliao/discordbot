@@ -5,6 +5,8 @@ import logging
 from vertexai.preview.vision_models import ImageGenerationModel
 import vertexai
 from collections import defaultdict
+import re  # Import the regular expression module
+from google.api_core.exceptions import InvalidArgument # Import InvalidArgument
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -20,6 +22,7 @@ DEFAULT_ASPECT_RATIO = "1:1"
 DEFAULT_NUMBER_OF_IMAGES = 1
 DETECT_LANGUAGE_PROMPT = "What language is this text in? Just response the language name: "
 TRANSLATE_PROMPT = "Translate the following text to English: "
+FALLBACK_IMAGE_RESPONSE = "無法辨識您的圖片描述，已隨機產生圖片。"
 
 # Global Variables
 image_generation_model = None
@@ -183,13 +186,14 @@ except Exception as e:
     logging.error(f"Failed to initialize models: {e}")
     exit(1)
 
+
 if __name__ == '__main__':
     # Test cases
-    test_prompt_text = "請介紹 Gemini API"
-    result_text = process_prompt(test_prompt_text, "test_user")
-    print(f"Text Result: {result_text}")
+    # test_prompt_text = "請介紹 Gemini API"
+    # result_text = process_prompt(test_prompt_text, "test_user")
+    # print(f"Text Result: {result_text}")
 
-    test_prompt_image = "image: 一隻微笑的狗，旁邊有一隻鄙視的貓。"
+    test_prompt_image = "image: สงครามแมว"
     result_image = process_prompt(test_prompt_image, "test_user")
     if result_image and isinstance(result_image, list):
         print(f"Image Result: {len(result_image)} images generated.")
@@ -201,6 +205,19 @@ if __name__ == '__main__':
     else:
         print(f"Image Result: Error generating images.")
 
-    test_prompt_image_empty = "image:"
-    result_image_empty = process_prompt(test_prompt_image_empty, "test_user")
-    print(f"Image Empty Result: {result_image_empty}")
+    # test_prompt_image_empty = "image:"
+    # result_image_empty = process_prompt(test_prompt_image_empty, "test_user")
+    # print(f"Image Empty Result: {result_image_empty}")
+
+    # # Test the new translation extraction
+    # test_translation_text = "สงครามแมว"
+    # result_translation = translate_to_english(test_translation_text)
+    # print(f"Translation Result: {result_translation}")
+
+    # test_translation_text2 = "你好"
+    # result_translation2 = translate_to_english(test_translation_text2)
+    # print(f"Translation Result2: {result_translation2}")
+
+    # test process_prompt with multiple language
+    # result_image_empty = process_prompt("image: 你好", "test_user")
+    # print(f"Image Empty Result: {result_image_empty}")
