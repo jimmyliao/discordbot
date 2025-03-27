@@ -12,8 +12,8 @@ from google.api_core.exceptions import InvalidArgument # Import InvalidArgument
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Constants
-PROJECT_ID = "gde-kj"  # Replace with your project ID if different
-LOCATION = "us-central1"  # Replace with your location if different
+PROJECT_ID = os.environ.get("PROJECT_ID")  # Replace with your project ID if different
+LOCATION = os.environ.get("REGION")  # Replace with your location if different
 IMAGEN_MODEL_NAME = "imagen-3.0-generate-002"
 GEMINI_MODEL_NAME = "gemini-2.0-flash-exp"
 PROMPT_SYSTEM = "請以繁體中文回應"
@@ -78,6 +78,7 @@ def detect_language(text):
     try:
         logging.info(f"Detecting language of text: {text}")
         response = chat_session.send_message(DETECT_LANGUAGE_PROMPT + text)
+        logging.info(f"Gemini API response: {response}")
         detected_language = response.text.strip()
         logging.info(f"Detected language: {detected_language}")
         return detected_language
@@ -154,7 +155,7 @@ def process_prompt(prompt, user_id):
     user_language_memory[user_id] = detected_language
     logging.info(f"User {user_id} prompt language: {detected_language}")
 
-    if prompt.startswith("image:"):
+    if prompt.startswith("image:") and os.environ.get("USE_VERTEXAI") == "true":
         image_prompt = prompt[6:].strip()  # Remove "image:" prefix and any leading/trailing spaces
         if not image_prompt:
             return "請在 `image:` 後面輸入圖片描述"
@@ -181,7 +182,8 @@ def process_prompt(prompt, user_id):
 # Initialize models when the module is loaded
 try:
     initialize_gemini_model()
-    initialize_imagen_model()
+    if os.environ.get("USE_VERTEXAI") == "true":
+        initialize_imagen_model()
 except Exception as e:
     logging.error(f"Failed to initialize models: {e}")
     exit(1)
