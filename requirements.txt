@@ -1,3 +1,5 @@
 discord.py
 google-generativeai
+fastapi
+uvicorn
 python-dotenv

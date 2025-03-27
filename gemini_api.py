@@ -1,5 +1,10 @@
 import google.generativeai as genai
+import os
 from config import GEMINI_API_KEY
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 genai.configure(api_key=GEMINI_API_KEY)
 
@@ -28,9 +33,12 @@ chat_session = model.start_chat(history=[{
 
 def generate_text(prompt):
     try:
+        logging.info(f"Generating text for prompt: {prompt}")
         response = chat_session.send_message(prompt)
+        logging.info(f"Generated text: {response.text}")
         return response.text
     except Exception as e:
+        logging.exception(f"Error generating text: {e}")
         return PROMPT_ERROR_EXCEPTION
 
 if __name__ == '__main__':

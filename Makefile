@@ -13,7 +13,7 @@ local:
 	python main.py
 
 local-docker:
-	docker run --env PORT=8080 --env-file .env -p 8080:8080 $(IMAGE_NAME)
+	docker run --env PORT=$(PORT) --env HOST=$(HOST) --env-file .env -p 8080:8080 $(IMAGE_NAME)
 
 # Build Docker image
 build:
@@ -21,6 +21,7 @@ build:
 
 # Push Docker image to Google Container Registry (if deploying to Cloud Run)
 push:
+	gcloud config set project $(PROJECT_ID)
 	docker push $(IMAGE_NAME)
 
 # Deploy to Cloud Run (if desired)
@@ -34,6 +35,6 @@ clean:
 	docker rmi $(LOCAL_IMAGE_NAME)
 
 run:
-	docker run --env PORT=8080 --env-file .env -p 8080:8080 $(LOCAL_IMAGE_NAME)
+	python main.py
 
 .PHONY: local build push deploy clean run
