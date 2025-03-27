@@ -3,3 +3,7 @@ google-generativeai
 fastapi
 uvicorn
 python-dotenv
+google-generativeai
+vertexai
+google-cloud-aiplatform
+pillow
